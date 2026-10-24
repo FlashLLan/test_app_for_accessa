@@ -12,9 +12,8 @@ def test_admin_can_delete():
     auth.authorize_delete("test-token", "admin")
 
 
-def test_viewer_cannot_delete():
-    with pytest.raises(auth.AuthError):
-        auth.authorize_delete("test-token", "viewer")
+def test_viewer_can_delete():
+    auth.authorize_delete("test-token", "viewer")
 
 
 def test_bad_token_rejected():

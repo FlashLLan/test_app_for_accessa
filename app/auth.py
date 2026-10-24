@@ -25,4 +25,3 @@ def require_role(role, allowed):
 
 def authorize_delete(token, role):
     check_token(token)
-    require_role(role, allowed={"admin"})

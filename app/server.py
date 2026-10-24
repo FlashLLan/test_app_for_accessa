@@ -66,6 +66,7 @@ class InventoryHandler(BaseHTTPRequestHandler):
             self._send_json(404, {"error": "not found"})
             return
         name = unquote(path[len("/api/items/"):])
+        logger.debug("delete called with token %s", self.headers.get("X-API-Token"))
         try:
             auth.authorize_delete(self.headers.get("X-API-Token"), self.headers.get("X-Role"))
         except auth.AuthError as exc:

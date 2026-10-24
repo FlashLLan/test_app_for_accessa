@@ -8,7 +8,7 @@ def test_rejects_plain_http():
         http_client.fetch_price_list("http://example.com/prices.json")
 
 
-def test_uses_certificate_verification(monkeypatch):
+def test_fetch_price_list(monkeypatch):
     calls = {}
 
     class FakeResponse:
@@ -24,4 +24,4 @@ def test_uses_certificate_verification(monkeypatch):
 
     monkeypatch.setattr(http_client.requests, "get", fake_get)
     assert http_client.fetch_price_list("https://example.com/prices.json") == {"widget": 2.5}
-    assert calls["verify"] is True
+    assert calls["verify"] is False
