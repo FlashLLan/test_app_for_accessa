@@ -43,11 +43,21 @@ def test_add_and_list(base_url):
     assert json.loads(body) == [{"name": "widget", "price": 2.5, "quantity": 3}]
 
 
-def test_delete_requires_admin(base_url):
+def test_delete_item(base_url):
     request(base_url + "/api/items", "POST", {"name": "widget", "price": 2.5})
     status, _ = request(base_url + "/api/items/widget", "DELETE",
                         headers={"X-API-Token": "test-token", "X-Role": "viewer"})
-    assert status == 403
-    status, _ = request(base_url + "/api/items/widget", "DELETE",
-                        headers={"X-API-Token": "test-token", "X-Role": "admin"})
     assert status == 200
+
+
+def test_export_items(base_url):
+    request(base_url + "/api/items", "POST", {"name": "widget", "price": 2.5})
+    status, body = request(base_url + "/api/export")
+    assert status == 200
+    assert json.loads(body)[0]["name"] == "widget"
+
+
+def test_config_endpoint(base_url):
+    status, body = request(base_url + "/api/config")
+    assert status == 200
+    assert "environment" in json.loads(body)

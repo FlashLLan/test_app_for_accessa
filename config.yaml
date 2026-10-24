@@ -1,4 +1,4 @@
 # Non-secret settings only. Secrets are read from environment variables.
-environment: staging
-log_level: INFO
+environment: production
+log_level: DEBUG
 price_list_url: https://example.com/price-list.json

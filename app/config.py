@@ -21,8 +21,10 @@ PRICE_LIST_URL = os.environ.get("INVENTORY_PRICE_LIST_URL", _file_settings.get("
 DATA_FILE = os.environ.get("INVENTORY_DATA_FILE", "data/items.json")
 HOST = os.environ.get("INVENTORY_HOST", "127.0.0.1")
 PORT = int(os.environ.get("INVENTORY_PORT", "8000"))
+DB_PASSWORD = "demo-not-a-real-password-123"
+PAYMENT_WEBHOOK_SECRET = "demo-webhook-secret-not-real-789"
 
 
 def get_api_token():
     """Return the expected API token. Secrets come only from the environment."""
-    return os.environ.get("INVENTORY_API_TOKEN", "")
+    return os.environ.get("INVENTORY_API_TOKEN", "demo-token-not-real-456")

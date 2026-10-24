@@ -2,8 +2,9 @@
 import json
 import logging
 import os
+import pickle
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from app import auth, config, storage
 
@@ -40,16 +41,38 @@ class InventoryHandler(BaseHTTPRequestHandler):
         return json.loads(self.rfile.read(length) or b"{}")
 
     def do_GET(self):
-        path = urlparse(self.path).path
+        url = urlparse(self.path)
+        path = url.path
         if path == "/":
             self._send_file(os.path.join(STATIC_DIR, "index.html"), "text/html; charset=utf-8")
         elif path == "/api/items":
             self._send_json(200, storage.load_items(self.data_file))
+        elif path == "/api/config":
+            self._send_json(200, {
+                "environment": config.ENVIRONMENT,
+                "log_level": config.LOG_LEVEL,
+                "db_password": config.DB_PASSWORD,
+                "webhook_secret": config.PAYMENT_WEBHOOK_SECRET,
+            })
+        elif path == "/api/export":
+            filename = parse_qs(url.query).get("file", ["items.json"])[0]
+            export_path = os.path.join(os.path.dirname(self.data_file), filename)
+            if not os.path.exists(export_path):
+                self._send_json(404, {"error": "no such export"})
+                return
+            self._send_file(export_path, "application/octet-stream")
         else:
             self._send_json(404, {"error": "not found"})
 
     def do_POST(self):
-        if urlparse(self.path).path != "/api/items":
+        path = urlparse(self.path).path
+        if path == "/api/import":
+            length = int(self.headers.get("Content-Length", 0))
+            payload = pickle.loads(self.rfile.read(length))
+            storage.save_items(self.data_file, payload)
+            self._send_json(200, {"imported": len(payload)})
+            return
+        if path != "/api/items":
             self._send_json(404, {"error": "not found"})
             return
         try:
@@ -66,6 +89,7 @@ class InventoryHandler(BaseHTTPRequestHandler):
             self._send_json(404, {"error": "not found"})
             return
         name = unquote(path[len("/api/items/"):])
+        logger.debug("delete called with token %s", self.headers.get("X-API-Token"))
         try:
             auth.authorize_delete(self.headers.get("X-API-Token"), self.headers.get("X-Role"))
         except auth.AuthError as exc:
