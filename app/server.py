@@ -3,7 +3,7 @@ import json
 import logging
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from app import auth, config, storage
 
@@ -40,11 +40,20 @@ class InventoryHandler(BaseHTTPRequestHandler):
         return json.loads(self.rfile.read(length) or b"{}")
 
     def do_GET(self):
-        path = urlparse(self.path).path
+        url = urlparse(self.path)
+        path = url.path
         if path == "/":
             self._send_file(os.path.join(STATIC_DIR, "index.html"), "text/html; charset=utf-8")
         elif path == "/api/items":
-            self._send_json(200, storage.load_items(self.data_file))
+            query = parse_qs(url.query)
+            key = query.get("sort", ["name"])[0]
+            descending = query.get("desc", ["0"])[0] == "1"
+            try:
+                items = storage.sort_items(storage.load_items(self.data_file), key, descending)
+            except ValueError as exc:
+                self._send_json(400, {"error": str(exc)})
+                return
+            self._send_json(200, items)
         else:
             self._send_json(404, {"error": "not found"})
 

@@ -34,3 +34,12 @@ def delete_item(path, name):
     if len(remaining) == len(items):
         raise KeyError(name)
     save_items(path, remaining)
+
+
+SORT_KEYS = ("name", "price")
+
+
+def sort_items(items, key="name", descending=False):
+    if key not in SORT_KEYS:
+        raise ValueError(f"cannot sort by {key!r}; choose one of {SORT_KEYS}")
+    return sorted(items, key=lambda item: item[key], reverse=descending)

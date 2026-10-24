@@ -32,7 +32,7 @@ pip install -r requirements.txt
 
 python -m app.main add widget 2.50 --quantity 10
 python -m app.main add bolt 0.25 --quantity 200
-python -m app.main list
+python -m app.main list --sort price --desc
 ```
 
 ### Web frontend
@@ -47,7 +47,7 @@ role on the page; only `admin` is allowed. The page uses a small JSON API:
 
 | Method | Path | Notes |
 | --- | --- | --- |
-| `GET` | `/api/items` | List items |
+| `GET` | `/api/items` | List items. Optional `?sort=name\|price` and `&desc=1` |
 | `POST` | `/api/items` | Body: `{"name": "...", "price": 1.5, "quantity": 3}` |
 | `DELETE` | `/api/items/<name>` | Headers: `X-API-Token`, `X-Role` |
 

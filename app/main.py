@@ -13,7 +13,9 @@ def build_parser():
     parser = argparse.ArgumentParser(prog="inventory")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("list", help="list all items")
+    list_cmd = sub.add_parser("list", help="list all items")
+    list_cmd.add_argument("--sort", choices=storage.SORT_KEYS, default="name")
+    list_cmd.add_argument("--desc", action="store_true", help="sort in descending order")
 
     add = sub.add_parser("add", help="add an item")
     add.add_argument("name")
@@ -39,7 +41,8 @@ def run(argv=None):
     logger.info("environment=%s command=%s", config.ENVIRONMENT, args.command)
 
     if args.command == "list":
-        for item in storage.load_items(config.DATA_FILE):
+        items = storage.sort_items(storage.load_items(config.DATA_FILE), args.sort, args.desc)
+        for item in items:
             print(f"{item['name']}\t{item['price']:.2f}\t{item['quantity']}")
     elif args.command == "add":
         item = storage.add_item(config.DATA_FILE, args.name, args.price, args.quantity)

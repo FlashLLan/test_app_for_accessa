@@ -21,6 +21,7 @@
     input { flex: 1 1 120px; min-width: 0; }
     button { background: var(--accent); border-color: var(--accent); color: #fff; cursor: pointer; }
     button.delete { background: none; color: var(--danger); border-color: var(--line); padding: 2px 10px; }
+    #sort-form { margin-bottom: 8px; }
     table { width: 100%; border-collapse: collapse; }
     th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
     th { color: var(--muted); font-weight: 500; font-size: 13px; }
@@ -58,6 +59,16 @@
 
   <section>
     <h2>Items</h2>
+    <form id="sort-form" onsubmit="return false">
+      <select id="sort" onchange="loadItems()">
+        <option value="name">Sort by name</option>
+        <option value="price">Sort by price</option>
+      </select>
+      <select id="direction" onchange="loadItems()">
+        <option value="0">Ascending</option>
+        <option value="1">Descending</option>
+      </select>
+    </form>
     <table>
       <thead><tr><th>Name</th><th class="num">Price</th><th class="num">Quantity</th><th></th></tr></thead>
       <tbody id="items"></tbody>
@@ -82,7 +93,9 @@
   }
 
   async function loadItems() {
-    const response = await fetch("/api/items");
+    const sort = document.getElementById("sort").value;
+    const desc = document.getElementById("direction").value;
+    const response = await fetch("/api/items?sort=" + sort + "&desc=" + desc);
     render(await response.json());
   }
 

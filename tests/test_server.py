@@ -51,3 +51,12 @@ def test_delete_requires_admin(base_url):
     status, _ = request(base_url + "/api/items/widget", "DELETE",
                         headers={"X-API-Token": "test-token", "X-Role": "admin"})
     assert status == 200
+
+
+def test_list_sorted_by_price(base_url):
+    request(base_url + "/api/items", "POST", {"name": "anvil", "price": 99})
+    request(base_url + "/api/items", "POST", {"name": "bolt", "price": 0.5})
+    status, body = request(base_url + "/api/items?sort=price")
+    assert [i["name"] for i in json.loads(body)] == ["bolt", "anvil"]
+    status, _ = request(base_url + "/api/items?sort=quantity")
+    assert status == 400
