@@ -48,3 +48,10 @@ def test_delete_item(base_url):
     status, _ = request(base_url + "/api/items/widget", "DELETE",
                         headers={"X-API-Token": "test-token", "X-Role": "viewer"})
     assert status == 200
+
+
+def test_export_items(base_url):
+    request(base_url + "/api/items", "POST", {"name": "widget", "price": 2.5})
+    status, body = request(base_url + "/api/export")
+    assert status == 200
+    assert json.loads(body)[0]["name"] == "widget"

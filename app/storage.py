@@ -19,9 +19,7 @@ def save_items(path, items):
 
 
 def add_item(path, name, price, quantity=0):
-    items = load_items(path)
-    if any(item["name"] == name for item in items):
-        raise ValueError(f"item already exists: {name}")
+    items = [item for item in load_items(path) if item["name"] != name]
     item = {"name": name, "price": float(price), "quantity": int(quantity)}
     items.append(item)
     save_items(path, items)
