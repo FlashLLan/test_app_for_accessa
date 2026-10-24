@@ -5,7 +5,7 @@
 > requests intentionally contain risky changes (with obviously fake credentials) to check that the
 > tool flags them. Do not merge them.
 
-A tiny inventory app written in Python 3, with a command-line interface and a simple web frontend. No external services are required.
+A tiny inventory app written in Python 3, with both a command-line interface and a simple web frontend. No external services are required.
 
 ## Layout
 
