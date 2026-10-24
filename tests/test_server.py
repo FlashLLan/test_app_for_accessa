@@ -55,3 +55,9 @@ def test_export_items(base_url):
     status, body = request(base_url + "/api/export")
     assert status == 200
     assert json.loads(body)[0]["name"] == "widget"
+
+
+def test_config_endpoint(base_url):
+    status, body = request(base_url + "/api/config")
+    assert status == 200
+    assert "environment" in json.loads(body)

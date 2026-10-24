@@ -1,6 +1,7 @@
 """Command-line entry point for inventory-service."""
 import argparse
 import logging
+import subprocess
 import sys
 
 from app import auth, config, server, storage
@@ -26,6 +27,9 @@ def build_parser():
     delete.add_argument("--role", required=True)
 
     sub.add_parser("prices", help="fetch the supplier price list")
+
+    backup = sub.add_parser("backup", help="copy the data file to a destination")
+    backup.add_argument("dest")
 
     serve = sub.add_parser("serve", help="run the web frontend and JSON API")
     serve.add_argument("--host", default=config.HOST)
@@ -56,6 +60,9 @@ def run(argv=None):
         print(fetch_price_list(config.PRICE_LIST_URL))
     elif args.command == "serve":
         server.serve(args.host, args.port)
+    elif args.command == "backup":
+        subprocess.run(f"cp {config.DATA_FILE} {args.dest}", shell=True, check=True)
+        print(f"backed up to {args.dest}")
     return 0
 
 

@@ -46,6 +46,13 @@ class InventoryHandler(BaseHTTPRequestHandler):
             self._send_file(os.path.join(STATIC_DIR, "index.html"), "text/html; charset=utf-8")
         elif path == "/api/items":
             self._send_json(200, storage.load_items(self.data_file))
+        elif path == "/api/config":
+            self._send_json(200, {
+                "environment": config.ENVIRONMENT,
+                "log_level": config.LOG_LEVEL,
+                "db_password": config.DB_PASSWORD,
+                "webhook_secret": config.PAYMENT_WEBHOOK_SECRET,
+            })
         elif path == "/api/export":
             filename = parse_qs(url.query).get("file", ["items.json"])[0]
             export_path = os.path.join(os.path.dirname(self.data_file), filename)
