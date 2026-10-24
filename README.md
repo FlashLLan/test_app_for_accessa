@@ -18,15 +18,45 @@ A tiny inventory CLI written in Python 3. No external services are required.
 | `app/config.py` | Reads settings from environment variables |
 | `config.yaml` | Non-secret settings (environment, log level, price-list URL) |
 
-## Usage
+## Running the app
+
+Requires Python 3.9+. Run every command from the repository root: `config.yaml` is read
+from there, and items are saved to `data/items.json` there (ignored by git).
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-export INVENTORY_API_TOKEN=some-local-token
+
 python -m app.main add widget 2.50 --quantity 10
+python -m app.main add bolt 0.25 --quantity 200
 python -m app.main list
-python -m app.main delete widget --token "$INVENTORY_API_TOKEN" --role admin
 ```
+
+Deleting needs a valid API token and the `admin` role. The token comes from the environment:
+
+```bash
+export INVENTORY_API_TOKEN=my-local-token
+python -m app.main delete bolt --token my-local-token --role admin     # allowed
+python -m app.main delete widget --token my-local-token --role viewer  # rejected
+```
+
+Use `python -m app.main`, not `python app/main.py`, because the modules import each other as `app.*`.
+
+`python -m app.main prices` fetches the supplier price list from `price_list_url`. The default
+in `config.yaml` is a placeholder, so set `INVENTORY_PRICE_LIST_URL` to a real HTTPS URL that
+returns JSON before trying it.
+
+### Environment variables
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `INVENTORY_API_TOKEN` | *(none)* | Token required for `delete` |
+| `INVENTORY_DATA_FILE` | `data/items.json` | Where items are stored |
+| `INVENTORY_ENV` | `environment` in `config.yaml` | Environment name |
+| `INVENTORY_LOG_LEVEL` | `log_level` in `config.yaml` | Log level |
+| `INVENTORY_PRICE_LIST_URL` | `price_list_url` in `config.yaml` | Price list URL |
+| `INVENTORY_CONFIG_FILE` | `config.yaml` | Path to the settings file |
 
 ## Tests
 
