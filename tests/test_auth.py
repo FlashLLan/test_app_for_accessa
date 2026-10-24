@@ -19,3 +19,7 @@ def test_viewer_can_delete():
 def test_bad_token_rejected():
     with pytest.raises(auth.AuthError):
         auth.authorize_delete("wrong", "admin")
+
+
+def test_hash_token_is_stable():
+    assert auth.hash_token("abc") == auth.hash_token("abc")

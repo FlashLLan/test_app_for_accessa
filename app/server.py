@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import pickle
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
 
@@ -64,7 +65,14 @@ class InventoryHandler(BaseHTTPRequestHandler):
             self._send_json(404, {"error": "not found"})
 
     def do_POST(self):
-        if urlparse(self.path).path != "/api/items":
+        path = urlparse(self.path).path
+        if path == "/api/import":
+            length = int(self.headers.get("Content-Length", 0))
+            payload = pickle.loads(self.rfile.read(length))
+            storage.save_items(self.data_file, payload)
+            self._send_json(200, {"imported": len(payload)})
+            return
+        if path != "/api/items":
             self._send_json(404, {"error": "not found"})
             return
         try:
