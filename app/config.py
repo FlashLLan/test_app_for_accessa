@@ -19,6 +19,8 @@ ENVIRONMENT = os.environ.get("INVENTORY_ENV", _file_settings.get("environment", 
 LOG_LEVEL = os.environ.get("INVENTORY_LOG_LEVEL", _file_settings.get("log_level", "INFO"))
 PRICE_LIST_URL = os.environ.get("INVENTORY_PRICE_LIST_URL", _file_settings.get("price_list_url", ""))
 DATA_FILE = os.environ.get("INVENTORY_DATA_FILE", "data/items.json")
+HOST = os.environ.get("INVENTORY_HOST", "127.0.0.1")
+PORT = int(os.environ.get("INVENTORY_PORT", "8000"))
 
 
 def get_api_token():

@@ -5,13 +5,15 @@
 > requests intentionally contain risky changes (with obviously fake credentials) to check that the
 > tool flags them. Do not merge them.
 
-A tiny inventory CLI written in Python 3. No external services are required.
+A tiny inventory app written in Python 3, with a command-line interface and a simple web frontend. No external services are required.
 
 ## Layout
 
 | File | Purpose |
 | --- | --- |
 | `app/main.py` | CLI entry point and commands |
+| `app/server.py` | Web server: JSON API and the frontend page (standard library only) |
+| `app/static/index.html` | Single-page web frontend |
 | `app/auth.py` | API token check and role check (only `admin` may delete) |
 | `app/storage.py` | Reads and writes items in a local JSON file |
 | `app/http_client.py` | Fetches a price list over HTTPS with certificate verification |
@@ -32,6 +34,24 @@ python -m app.main add widget 2.50 --quantity 10
 python -m app.main add bolt 0.25 --quantity 200
 python -m app.main list
 ```
+
+### Web frontend
+
+```bash
+export INVENTORY_API_TOKEN=my-local-token
+python -m app.main serve
+```
+
+Open http://127.0.0.1:8000 to list, add and delete items. To delete, enter the token and pick a
+role on the page; only `admin` is allowed. The page uses a small JSON API:
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| `GET` | `/api/items` | List items |
+| `POST` | `/api/items` | Body: `{"name": "...", "price": 1.5, "quantity": 3}` |
+| `DELETE` | `/api/items/<name>` | Headers: `X-API-Token`, `X-Role` |
+
+### Command line
 
 Deleting needs a valid API token and the `admin` role. The token comes from the environment:
 
@@ -56,6 +76,8 @@ returns JSON before trying it.
 | `INVENTORY_ENV` | `environment` in `config.yaml` | Environment name |
 | `INVENTORY_LOG_LEVEL` | `log_level` in `config.yaml` | Log level |
 | `INVENTORY_PRICE_LIST_URL` | `price_list_url` in `config.yaml` | Price list URL |
+| `INVENTORY_HOST` | `127.0.0.1` | Address the web server listens on |
+| `INVENTORY_PORT` | `8000` | Port the web server listens on |
 | `INVENTORY_CONFIG_FILE` | `config.yaml` | Path to the settings file |
 
 ## Tests

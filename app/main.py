@@ -3,7 +3,7 @@ import argparse
 import logging
 import sys
 
-from app import auth, config, storage
+from app import auth, config, server, storage
 from app.http_client import fetch_price_list
 
 logger = logging.getLogger("inventory")
@@ -26,6 +26,10 @@ def build_parser():
     delete.add_argument("--role", required=True)
 
     sub.add_parser("prices", help="fetch the supplier price list")
+
+    serve = sub.add_parser("serve", help="run the web frontend and JSON API")
+    serve.add_argument("--host", default=config.HOST)
+    serve.add_argument("--port", type=int, default=config.PORT)
     return parser
 
 
@@ -50,6 +54,8 @@ def run(argv=None):
         print(f"deleted {args.name}")
     elif args.command == "prices":
         print(fetch_price_list(config.PRICE_LIST_URL))
+    elif args.command == "serve":
+        server.serve(args.host, args.port)
     return 0
 
 
